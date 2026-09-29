@@ -1,7 +1,6 @@
-"""Multi-label training and independent FastPath scoring.
+"""Multi-label training and independent FastPath scoring for the V5 comparison.
 
-The backbone, optimizer/schedule configuration, and path-instance draws follow
-the shared HGB-style training protocol.
+The backbone, optimizer/schedule configuration, and path-instance draws follow V3.
 Only the objective and metrics change: mean BCE over nodes and labels, and F1 at
 ``sigmoid(logits) >= 0.5``. No categorical accuracy or set-aware probe is used.
 
@@ -24,7 +23,7 @@ import torch.nn.functional as F
 
 from auto_phgt.runtime import cuda_memory, to_device
 from auto_phgt.training import set_seed
-from experiments.hgb_training import _forward, backbone, predict
+from experiments.residual_selection.train import _forward, backbone, predict
 
 _BCE_CLIP = 1e-12
 _FOLD_RULE = "label-independent seeded permutation dealt round-robin"
@@ -77,9 +76,9 @@ def multilabel_metrics(labels: torch.Tensor, logits: torch.Tensor) -> dict:
 
 
 def fit_multilabel(model, graph, x_dict, extractor, train_ids, val_ids, cfg, seed: int) -> dict:
-    """Fit using BCEWithLogits and best-validation-loss restoration.
+    """V3-compatible fit result using BCEWithLogits and best-validation-loss restoration.
 
-    ``cfg`` is the caller's configuration, completed by ``backbone``.
+    ``cfg`` is the caller's frozen common configuration, completed by V3 ``backbone``.
     Only the supplied training/validation labels are read. The incoming model mode is
     restored, including when a forward pass fails.
     """
@@ -148,7 +147,7 @@ def fit_multilabel(model, graph, x_dict, extractor, train_ids, val_ids, cfg, see
 
 
 def evaluate_multilabel(model, graph, x_dict, extractor, ids) -> dict:
-    """Evaluate only ``ids``, with a fixed seed-1 path draw and model-mode preservation."""
+    """Evaluate only ``ids``, with V3's fixed seed-1 path draw and model-mode preservation."""
     ids, labels = _targets(graph[model.target_node_type].y, ids, "ids")
     logits = predict(model, graph, x_dict, extractor, ids, seed=1)
     return {**multilabel_metrics(labels, logits), "n": int(ids.numel())}
@@ -212,12 +211,12 @@ def propagate_multilabel(block, labels, fold_ids):
 
 
 def multilabel_fastpath_scores(block, labels, *, folds=3, seed=0, smoothing_eps=0.1) -> dict:
-    """Independent FastPath score, replacing categorical CE with mean OOF BCE.
+    """Independent V4 FastPath score, replacing categorical CE with mean OOF BCE.
 
     Balanced shuffled folds depend only on n, fold count and seed, never on labels.
     ``Q_FP = -BCE`` is ranked descending (canonical rank breaks ties), without any
     set-aware fitting. ``CE`` is an alias of ``BCE`` for the existing result schema.
-    F1 uses unsmoothed OOF probabilities; smoothing toward the known-fold
+    F1 uses unsmoothed OOF probabilities, as in V4; smoothing toward the known-fold
     prior and clipping to [1e-12, 1-1e-12] are used only to evaluate BCE.
     """
     labels = _binary_array(labels)

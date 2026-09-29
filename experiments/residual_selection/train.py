@@ -19,7 +19,7 @@ from auto_phgt.runtime import cuda_memory, to_device
 from auto_phgt.tokenization import MetaPathInstanceExtractor
 from auto_phgt.training import set_seed
 
-from .hgb_protocol import AUTO_PHGT, BACKBONE_FIXED
+from .plan import AUTO_PHGT, BACKBONE_FIXED
 
 
 def backbone(cfg: dict) -> dict:

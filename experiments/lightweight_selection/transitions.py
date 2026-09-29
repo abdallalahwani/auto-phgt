@@ -1,4 +1,4 @@
-"""Sparse, memory-safe path transition statistics.
+"""Sparse, memory-safe path transition statistics for V4-Hedge.
 
 For a meta-path p = (r_1, ..., r_h), P_r is the row-normalised adjacency of relation r and
 T_p = P_r1 @ ... @ P_rh. Rows of T_p are computed chunk-wise from sparse products (a chunk is

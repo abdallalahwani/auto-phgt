@@ -7,9 +7,9 @@ import torch.nn.functional as F
 from sklearn.metrics import f1_score
 from torch_geometric.data import HeteroData
 
-from experiments.hgb_training import build_model, extractor_for, predict
-from experiments.path_ranking import rank_by
-from experiments import multilabel as ml
+from experiments.residual_selection.train import build_model, extractor_for, predict
+from experiments.lightweight_selection.selectors import rank_by
+from experiments.method_comparison import multilabel as ml
 
 CFG = {"layers": 1, "lr": 1e-2, "wd": 1e-4, "dropout": 0.0, "heads": 2,
        "d_model": 16, "max_epochs": 6, "patience": 3, "pct_start": 0.5}

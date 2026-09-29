@@ -1,4 +1,4 @@
-"""Selectors: Transition-Info (independent and set-aware) and FastPath (individual and
+"""V4 selectors: Transition-Info (independent and set-aware) and FastPath (individual and
 set-aware). Every function is deterministic; ties are broken by canonical structural rank."""
 
 from __future__ import annotations

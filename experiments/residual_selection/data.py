@@ -1,4 +1,4 @@
-"""HGB datasets: loading, HGB-style splits, feature regimes, label-free representations."""
+"""HGB datasets for V3: loading, HGB-style splits, feature regimes, label-free representations."""
 
 from __future__ import annotations
 
@@ -10,12 +10,7 @@ from torch_geometric.datasets import HGBDataset
 
 from auto_phgt.tokenization import impute_missing_features
 
-DATASETS = {
-    "acm": {"name": "ACM", "root": "data/acm", "target": "paper"},
-    "dblp": {"name": "DBLP", "root": "data/hgb/dblp", "target": "author"},
-    "freebase": {"name": "Freebase", "root": "data/hgb/freebase", "target": "book"},
-    "imdb": {"name": "IMDB", "root": "data/hgb/imdb", "target": "movie"},
-}
+from .plan import DATASETS
 
 
 def load(ds: str):

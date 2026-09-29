@@ -11,6 +11,15 @@ artifacts/
 results/
 logs/
 checkpoints/
+slurm/
+notebooks/
+reports/
+smoke/
+*.sbatch
+*.slurm
+*.out
+*.log
+*.jsonl
 *.pt
 *.pth
 *.pkl

@@ -5,9 +5,9 @@ import pytest
 import torch
 from torch_geometric.data import HeteroData
 
-import experiments.edge_overlap as edge_overlap
+import experiments.method_comparison.edge_overlap as edge_overlap
 from auto_phgt.tokenization import MetaPathInstanceExtractor, MetaPathTemplate, PathInstances
-from experiments.edge_overlap import (
+from experiments.method_comparison.edge_overlap import (
     edge_overlap_matrix,
     greedy_edge_overlap,
     mean_source_jaccards,

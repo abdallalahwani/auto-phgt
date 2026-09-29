@@ -13,27 +13,35 @@ S(p)=\left(N_{\mathrm{target}}\prod_{r\in p}
 Here \(E_r/N_{\mathrm{src}(r)}\) is the relation's mean out-degree, not a
 transition probability.
 
-## Source layout
+## Source layout and research campaigns
 
-* `auto_phgt/`: path discovery, CSR instance sampling, tokenization, HGT and
-  transformer fusion, node/neighbor sampling, training, and evaluation.
-* `experiments/run_acm.py` and `experiments/run_mag.py`: independent ACM and
-  OGBN-MAG reference entry points.
-* `experiments/hgb_data.py`, `hgb_training.py`, and `multilabel.py`: HGB dataset
-  splits, shared full-graph model/training utilities, and IMDB-style
-  multi-label loss and F1.
-* `experiments/transition_info.py`, `path_ranking.py`, and `edge_overlap.py`:
-  label-free transition statistics, training-only FastPath scores, and
-  sampled-edge redundancy with a deterministic greedy selector.
-* `tests/`: focused unit and synthetic-graph integration tests.
+* `auto_phgt/` contains the discovery, CSR instance sampling, tokenization,
+  HGT/transformer fusion, heterogeneous neighbor sampling, training and
+  evaluation used by every campaign.
+* `experiments/run_acm.py`, `run_mag.py`, `baseline_suite.py`, `aggregate.py`:
+  initial ACM/MAG experiments and summaries.
+* `experiments/selector_controls.py`, `selector_controls_summary.py`:
+  controls, manually specified paths, and multi-seed selector comparisons.
+* `experiments/residual_selection/` and `residual_campaign.py`:
+  dataset splits, HGB-style HGT trainer, RCMS, protocol, training tasks and
+  aggregation for ACM, DBLP, Freebase and OGBN-MAG.
+* `experiments/lightweight_selection/`, `lightweight_campaign.py`, and
+  `lightweight_recovery.py`: Transition-Info, FastPath and set-aware selection,
+  frozen protocol, experiment task graph and recovery.
+* `experiments/method_comparison/`: EdgeOverlap, multi-label IMDB training,
+  candidate scoring/selection, frozen matrix, worker, resuming controller and
+  completion-aware aggregation for ACM, DBLP and IMDB.
+* `experiments/freebase_comparison.py`: separately frozen Freebase EdgeOverlap
+  extension with matched historical reference checks.
+* `tests/`: synthetic-graph tests and campaign-level protocol/aggregation
+  checks. The Freebase integration tests require locally generated, ignored
+  campaign artifacts and skip explicitly when those are absent.
 
 The EdgeOverlap rule selects the next path \(p\) to maximize
 \(\mathrm{TI}_{\mathrm{cov}}(p)(1-\max_{q\in S}O(p,q))\), where \(O\) is the mean
 per-source Jaccard of typed directed edges from complete sampled paths.
-The raw selected paths depend on the dataset and discovery space; they are
-not packaged as universal constants.
 
-## Install and test
+## Install and validate
 
 Use Python 3.12 and install an appropriate PyTorch build for your CPU or GPU,
 then `pip install -r requirements.txt`. For an RTX 2080 Ti or Titan Xp, the
@@ -45,18 +53,33 @@ pip install -r requirements.txt
 pytest -q tests
 ```
 
-Dataset downloads and runtime outputs are generated locally and ignored by
-Git. For example, from the project root:
+GPU-heavy jobs must run inside an authorized compute allocation, not on a
+login node. The Python modules expose `--help` for entry points:
 
 ```sh
-python -m experiments.run_acm --mode auto_phgt --seed 0 --device cuda
-python -m experiments.run_mag --mode hgt --seed 0 --device cuda
+python -m experiments.run_acm --help
+python -m experiments.run_mag --help
+python -m experiments.residual_campaign --help
+python -m experiments.lightweight_campaign --help
+python -m experiments.method_comparison.worker --help
+python -m experiments.method_comparison.controller --help
+python -m experiments.freebase_comparison --help
 ```
 
-The original research campaigns used additional frozen experiment plans,
-hardware-specific launch scripts, saved dataset checksums, and cached results.
-Those historical campaigns are **not** reproduced by these two reference
-entry points; do not interpret their output as a reproduction of any prior
-reported comparison. This source-only release intentionally excludes datasets,
-results, checkpoints, hardware launch scripts, historical campaign
-orchestrators, notebooks, and private project documents.
+## Reproduction and provenance
+
+This is a **source-only publication**, not a copy of the original experiment
+workspace. Campaign output IDs and ignored `artifacts/v2/`, `artifacts/v3/`,
+`artifacts/v4_hedge/`, and `artifacts/v5/` paths retain their historical names
+so existing results can still be identified. Source modules have descriptive
+names here rather than the old `experiments.v3`, `experiments.v4_hedge`, and
+`experiments.v5` imports. Historical protocol locks hash the **original**
+source filenames and contents: they cannot be applied directly to renamed
+files in this release. Fresh execution needs its own compatible protocol
+freeze and locally generated data/results; the later comparison additionally
+requires earlier compatible result files. Do not infer that running a reference
+entry point reproduces a past published table.
+
+Datasets, frozen locks, raw results, checkpoints, logs, smoke output, Slurm
+launch scripts, notebooks and the project proposal are intentionally not
+included. No results or official benchmark claims are stored in this repo.
